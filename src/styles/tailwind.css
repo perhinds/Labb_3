@@ -1,0 +1,12 @@
+/* styles/globals.css eller styles/tailwind.css */
+
+/* Tailwind Base Styles */
+@tailwind base;
+
+/* Tailwind Component Styles */
+@tailwind components;
+
+/* Tailwind Utility Styles */
+@tailwind utilities;
+
+/* Om du har några egna anpassade stilar kan du lägga till dem här */
