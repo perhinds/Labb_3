@@ -4,8 +4,6 @@ module.exports = {
     transform: {
       '^.+\\.tsx?$': 'ts-jest', // Konverterar TypeScript-filer
     },
-    moduleNameMapper: {
-      '\\.(css|less)$': 'identity-obj-proxy', // Hanterar CSS-importer i tester
-    },
-    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'], // Gör jest-dom tillgängligt i alla tester
+    moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
+    transformIgnorePatterns: ['node_modules/(?!your-module-to-transform)'],
   };

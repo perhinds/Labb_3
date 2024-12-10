@@ -1,126 +1,106 @@
-import React, { useState, useEffect } from 'react'
-import { fetchQuizData, Question } from '../api/quizApi'
+import React, { useState, useEffect } from 'react';
+import { fetchQuizData, Question } from '../api/quizApi';
+import Summary from '../components/Summary';
 
 interface QuizCardProps {
-    category: string
-    difficulty: string
+    category: string;
+    difficulty: string;
 }
 
 const QuizCard: React.FC<QuizCardProps> = ({ category, difficulty }) => {
-    const [loading, setLoading] = useState<boolean>(true)
-    const [selectedAnswers, setSelectedAnswers] = useState<
-        Record<number, string>
-    >({})
-    const [feedback, setFeedback] = useState<string[]>([])
-    const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([])
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [answers, setAnswers] = useState<Record<number, { selected: string; correct: boolean }>>({});
 
     useEffect(() => {
         const loadQuestions = async () => {
             try {
-                const quizData = await fetchQuizData(10, category, difficulty)
-
-                // Blanda svaren när quizet startar
-                const shuffledData = quizData.map((question) => {
-                    const allAnswers = [
-                        ...question.incorrect_answers,
-                        question.correct_answer
-                    ]
-                    // Blanda svaren
-                    for (let i = allAnswers.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1))
-                        ;[allAnswers[i], allAnswers[j]] = [
-                            allAnswers[j],
-                            allAnswers[i]
-                        ]
-                    }
-                    return { ...question, allAnswers } // Lägg till de blandade svaren
-                })
-
-                setShuffledQuestions(shuffledData) // Sätt de blandade frågorna
-            } catch (error) {
-                console.error('Error loading questions', error)
+                const quizData = await fetchQuizData(10, category, difficulty);
+                setQuestions(
+                    quizData.map((question) => ({
+                        ...question,
+                        allAnswers: shuffleArray([...question.incorrect_answers, question.correct_answer]),
+                    }))
+                );
+            } catch (err) {
+                console.error('Error loading questions', err);
+                setError('Kunde inte ladda frågorna. Försök igen senare.');
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
-        loadQuestions()
-    }, [category, difficulty])
+        loadQuestions();
+    }, [category, difficulty]);
 
-    const handleAnswerChange = (
-        questionIndex: number,
-        selectedAnswer: string
-    ) => {
-        setSelectedAnswers((prevAnswers) => ({
-            ...prevAnswers,
-            [questionIndex]: selectedAnswer
-        }))
+    const handleAnswerChange = (questionIndex: number, selectedAnswer: string) => {
+        const correct = selectedAnswer === questions[questionIndex].correct_answer;
+        setAnswers((prev) => ({
+            ...prev,
+            [questionIndex]: { selected: selectedAnswer, correct },
+        }));
+    };
 
-        if (
-            selectedAnswer === shuffledQuestions[questionIndex].correct_answer
-        ) {
-            setFeedback((prevFeedback) => {
-                const newFeedback = [...prevFeedback]
-                newFeedback[questionIndex] = 'Ditt svar är rätt!'
-                return newFeedback
-            })
-        } else {
-            setFeedback((prevFeedback) => {
-                const newFeedback = [...prevFeedback]
-                newFeedback[questionIndex] = 'Ditt svar är fel!'
-                return newFeedback
-            })
-        }
-    }
+    // Beräkna antal rätt
+    const correctAnswersCount = Object.values(answers).filter((answer) => answer.correct).length;
 
-    if (loading) return <div className="text-center text-xl">Loading...</div>
+    // Kontrollera om alla frågor är besvarade
+    const allAnswered = Object.keys(answers).length === questions.length;
+
+    if (loading) return <div className="text-center text-xl">Loading...</div>;
+    if (error) return <div className="text-center text-xl text-red-500">{error}</div>;
 
     return (
         <div className="max-w-3xl mx-auto p-4">
-            {shuffledQuestions.map((question, index) => (
-                <div key={index} className="mb-6 p-4 border-b">
-                    <p className="font-semibold mb-2">{question.question}</p>
-
-                    <div className="space-y-2">
-                        {question.allAnswers.map(
-                            (answer: string, idx: number) => (
-                                <label
-                                    key={idx}
-                                    className="flex items-center space-x-2 cursor-pointer"
-                                >
+            {!allAnswered ? (
+                questions.map((question, index) => (
+                    <div key={index} className="mb-6 p-4 border-b">
+                        <p className="font-semibold mb-2">{question.question}</p>
+                        <div className="space-y-2">
+                            {question.allAnswers.map((answer, idx) => (
+                                <label key={idx} className="flex items-center space-x-2 cursor-pointer">
                                     <input
-                                        type="checkbox"
+                                        type="radio"
+                                        name={`question-${index}`}
                                         className="w-5 h-5"
-                                        checked={
-                                            selectedAnswers[index] === answer
-                                        }
-                                        onChange={() =>
-                                            handleAnswerChange(index, answer)
-                                        }
+                                        checked={answers[index]?.selected === answer}
+                                        onChange={() => handleAnswerChange(index, answer)}
                                     />
                                     <span>{answer}</span>
                                 </label>
-                            )
+                            ))}
+                        </div>
+                        {answers[index]?.selected && (
+                            <p
+                                className={`mt-2 text-sm ${
+                                    answers[index]?.correct ? 'text-green-500' : 'text-red-500'
+                                }`}
+                            >
+                                {answers[index]?.correct ? 'Ditt svar är rätt!' : 'Ditt svar är fel!'}
+                            </p>
                         )}
                     </div>
-
-                    {/* Show feedback */}
-                    {selectedAnswers[index] && (
-                        <p
-                            className={`mt-2 text-sm ${
-                                selectedAnswers[index] ===
-                                question.correct_answer
-                                    ? 'text-green-500'
-                                    : 'text-red-500'
-                            }`}
-                        >
-                            {feedback[index]}
-                        </p>
-                    )}
-                </div>
-            ))}
+                ))
+            ) : (
+                // Summeringsdelen som en separat komponent
+                <Summary
+                    correctAnswersCount={correctAnswersCount}
+                    totalQuestions={questions.length}
+                    onRetry={() => window.location.reload()} // Skicka retry-funktionen här
+                />
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default QuizCard
+const shuffleArray = (array: string[]): string[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
+export default QuizCard;

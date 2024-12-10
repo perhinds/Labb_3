@@ -7,7 +7,7 @@ import Footer from '../../components/Footer' // Importera Footer
 
 const QuizPage = () => {
     const router = useRouter()
-    const { id } = router.query
+    const { id, categoryName } = router.query
 
     // Hantera fall där id inte är tillgängligt än (t.ex. när sidan laddas första gången)
     if (router.isFallback) {
@@ -28,7 +28,7 @@ const QuizPage = () => {
             <Header />
             <main className="flex-grow container mx-auto p-8">
                 <h1 className="text-3xl mb-4 text-center">
-                    quiz: {id}
+                    {categoryName}
                 </h1>
                 <QuizCard category={id as string} difficulty="easy" />
             </main>

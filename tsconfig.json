@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "esnext"
@@ -24,9 +24,9 @@
   },
   "include": [
     "src",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts" // Inkludera type-definitioner från Next.js
   ],
   "exclude": [
-    "node_modules"
+    "node_modules" // Uteslut node_modules från kompilering
   ]
 }

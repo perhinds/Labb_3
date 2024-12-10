@@ -70,16 +70,14 @@ const QuizList = () => {
                 <div className="mb-6">
                     <label
                         htmlFor="category"
-                        className="block text-lg font-medium mb-2"
-                    >
+                        className="block text-lg font-medium mb-2">
                         Välj en kategori:
                     </label>
                     <select
                         id="category"
                         className="w-full p-2 border border-gray-300 rounded-md"
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
+                        onChange={(e) => setSelectedCategory(e.target.value)}>
                         <option value="" disabled></option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id}>
@@ -92,10 +90,12 @@ const QuizList = () => {
                 {selectedCategory && (
                     <div className="text-center">
                         <Link
-                            href={`/quiz/${selectedCategory}`}
-                            className="text-blue-600 hover:underline text-lg"
-                        >
-                            Kör igång!
+                            href={{
+                                pathname: `/quiz/${selectedCategory}`,
+                                query: { categoryName: categories.find((cat) => String(cat.id) === String(selectedCategory))?.name || 'okänd kategori' },
+                            }}
+                            className="text-blue-600 hover:underline text-lg">
+                            Kör igång med {categories.find((cat) => String(cat.id) === String(selectedCategory))?.name || 'okänd kategori'}!
                         </Link>
                     </div>
                 )}

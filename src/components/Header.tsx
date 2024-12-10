@@ -5,8 +5,7 @@ const Header: React.FC = () => {
     return (
         <header
             className="bg-blue-500 text-white py-4 px-8 text-center"
-            aria-label="Header"
-        >
+            aria-label="Header">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4">
                 Välkommen till quizappen
             </h1>
@@ -16,8 +15,7 @@ const Header: React.FC = () => {
                     <li>
                         <Link
                             href="/"
-                            className="hover:text-blue-200 transition-colors"
-                        >
+                            className="hover:text-blue-200 transition-colors">
                             Hem
                         </Link>
                     </li>
