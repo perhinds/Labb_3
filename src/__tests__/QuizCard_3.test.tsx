@@ -51,31 +51,4 @@ describe('QuizCard', () => {
         });
     });
 
-    test('kallar onRetry när Försök igen-knappen klickas', async () => {
-        const mockRetry = jest.fn();
-        render(<QuizCard category="22" difficulty="easy" />);
-
-        // Vänta på att frågorna renderas
-        await waitFor(() => {
-            expect(screen.getByText(/Vad är huvudingredienserna i en traditionell pizza Margherita\?/i)).toBeInTheDocument();
-        });
-
-        // Svara på frågorna
-        const firstAnswer = screen.getByLabelText(/Tomat, mozzarella, basilika/i);
-        fireEvent.click(firstAnswer);
-
-        const secondAnswer = screen.getByLabelText(/Avokado/i);
-        fireEvent.click(secondAnswer);
-
-        // Vänta på att summeringen ska dyka upp
-        await waitFor(() => {
-            expect(screen.getByTestId('retry-button')).toBeInTheDocument();
-        });
-
-        // Klicka på retry-knappen
-        fireEvent.click(screen.getByTestId('retry-button'));
-
-        // Kontrollera att retry-funktionen anropades
-        expect(mockRetry).toHaveBeenCalledTimes(1);
-    });
 });

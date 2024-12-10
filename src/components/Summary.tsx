@@ -14,7 +14,7 @@ const Summary: React.FC<SummaryProps> = ({
     return (
         <div className="text-center mt-8" data-testid="summary">
             <h2 className="text-2xl font-bold" data-testid="summary-title">
-                Resultat:
+                Sammanfattning
             </h2>
             <p className="text-lg mt-4" data-testid="summary-text">
                 Du fick{' '}
