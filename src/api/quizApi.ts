@@ -22,7 +22,7 @@ const fetchToken = async (): Promise<string> => {
     });
     if (response.data.response_code === 0) {
       tokenCache = response.data.token;
-      return tokenCache;
+      return tokenCache || ''; ;
     }
     throw new Error('Failed to fetch token');
   } catch (error) {
@@ -71,4 +71,3 @@ export const fetchQuizData = async (
   }
   throw new Error('Failed to fetch quiz data after multiple attempts');
 };
-
